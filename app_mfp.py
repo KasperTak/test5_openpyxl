@@ -4,31 +4,21 @@ Created on Sun Feb  4 10:05:17 2024
 
 @author: Gebruiker
 """
-#%%
-import numpy as np
-import math
-import pandas as pd
-import openpyxl
-import base64
-import io
-#%%
-
-import numpy as np
-import math
 import streamlit as st
+import openpyxl
+import numpy as np
+import math
 import pandas as pd
 import altair as alt
 import base64
 import io
 
 
-
-
 st.set_page_config(page_title="Financiële Planning")
 
 st.title("Financiële Planning")
 
-st.markdown("Voer uw gegevens in om te berekenen hoeveel u maximaal kunt lenen en hoe groot uw eigenwoningsschuld zal zijn!")
+st.markdown("Voor uw gegevens in om te berekenen hoeveel u maximaal kunt lenen en hoe groot uw eigenwoningsschuld zal zijn!")
 
 tab1, tab2, tab3 = st.tabs(["Hypotheek","Eigenwoningsschuld","Aflossing"])
 
@@ -38,11 +28,37 @@ AOW_leeftijd = 68
 
 with tab1:
     column1, column2, column3 = st.columns(3)
-    VOOR_AOW = pd.read_excel(r"C:\Users\Gebruiker\OneDrive - Office 365 Fontys\Documenten\Privé\Programmeren\Financieringspercentages_Annuiteitenfactor.xlsx",sheet_name='Voor AOW')
-    NA_AOW = pd.read_excel(r"C:\Users\Gebruiker\OneDrive - Office 365 Fontys\Documenten\Privé\Programmeren\Financieringspercentages_Annuiteitenfactor.xlsx",sheet_name='Na AOW')
-    annuiteitentabel = pd.read_excel(r"C:\Users\Gebruiker\OneDrive - Office 365 Fontys\Documenten\Privé\Programmeren\Financieringspercentages_Annuiteitenfactor.xlsx",sheet_name='Annuiteitenfactor') 
-    studieschuldtabel = pd.read_excel(r"C:\Users\Gebruiker\OneDrive - Office 365 Fontys\Documenten\Privé\Programmeren\Financieringspercentages_Annuiteitenfactor.xlsx",sheet_name='Studieschuld') 
-    studieschuldtabel['Debetrente'] = studieschuldtabel['Debetrente'].apply(lambda x: f"{x:.3f}".replace('.',','))
+
+    workbook = openpyxl.load_workbook('Financieringspercentages_Annuiteitenfactor.xlsx')
+    VOOR_AOW = workbook['Voor AOW']
+    NA_AOW = workbook['Na AOW']
+    annuiteitentabel = workbook['Annuiteitenfactor']
+    studieschuldtabel = workbook['Studieschuld'] 
+    
+   # VOOR_AOW = pd.read_excel("Financieringspercentages_Annuiteitenfactor.xlsx",sheet_name='Voor AOW')
+   # NA_AOW = pd.read_excel("Financieringspercentages_Annuiteitenfactor.xlsx",sheet_name='Na AOW')
+   # annuiteitentabel = pd.read_excel("Financieringspercentages_Annuiteitenfactor.xlsx",sheet_name='Annuiteitenfactor') 
+   # studieschuldtabel = pd.read_excel("Financieringspercentages_Annuiteitenfactor.xlsx",sheet_name='Studieschuld') 
+ # tabel juiste format
+    kolomindex_debetrente = None
+    for kolom in studieschuldtabel.iter_cols(min_row=1, max_row=1):
+        for cel in kolom:
+            if cel.value == 'Debetrente':
+                kolomindex_debetrente = cel.column
+                break
+    
+    # Controleer of 'Debetrente' is gevonden
+    if kolomindex_debetrente is not None:
+        # Verwerk de kolom 'Debetrente'
+        for rij in studieschuldtabel.iter_rows(min_row=2, min_col=kolomindex_debetrente, max_col=kolomindex_debetrente):
+            cel = rij[0]  # Omdat we maar één kolom doorlopen, is er maar één cel in de rij
+            waarde = cel.value
+            # Voer verdere verwerking uit met de waarde, bijvoorbeeld formattering
+            geformatteerde_waarde = f"{waarde:.3f}".replace('.', ',')
+            # Plaats de geformatteerde waarde terug in de cel of doe iets anders mee
+            cel.value = geformatteerde_waarde
+    else:
+        print("Kolom 'Debetrente' niet gevonden in het werkblad 'Studieschuld'.")
     
     with column1:
         st.subheader("Partnerschap")
@@ -310,7 +326,7 @@ with tab3:
         tot_bruto_mndlasten = sum(bruto_maandlasten)
         
         data = pd.DataFrame({
-                    'Soort last': ['Hypotheek','Maandelijkse aflossing', 'Totale rente', 'Totale bruto last'],
+                    'Soort last': ['Hypotheek','Maandelijkse aflossing', 'Totale rente', 'Totale bruto maandlast'],
                     'Bedrag': [hoofdsom, aflossing, tot_rente,tot_bruto_mndlasten]})
         data['Bedrag'] = data['Bedrag'].apply(lambda x: f"€{x:,.2f}".replace('.',',').replace(',', '.',1))
         st.dataframe(data.set_index(data.columns[0]))
@@ -390,22 +406,3 @@ with tab3:
         lineaire_hypotheek(hoofdsom, tijdsperiode, rentepercentage)
         #df_resultaat = lineaire_hypotheek(hoofdsom, tijdsperiode, rentepercentage)
         
-
-
-#%% financieringspercentages
-import pandas as pd
-VOOR_AOW = pd.read_excel(r"C:\Users\Gebruiker\OneDrive - Office 365 Fontys\Documenten\Privé\Programmeren\Financieringspercentages_Annuiteitenfactor.xlsx",sheet_name='Voor AOW')
-NA_AOW = pd.read_excel(r"C:\Users\Gebruiker\OneDrive - Office 365 Fontys\Documenten\Privé\Programmeren\Financieringspercentages_Annuiteitenfactor.xlsx",sheet_name='Na AOW')
-studieschuldtabel = pd.read_excel(r"C:\Users\Gebruiker\OneDrive - Office 365 Fontys\Documenten\Privé\Programmeren\Financieringspercentages_Annuiteitenfactor.xlsx",sheet_name='Studieschuld') 
-annuiteitentabel = pd.read_excel(r"C:\Users\Gebruiker\OneDrive - Office 365 Fontys\Documenten\Privé\Programmeren\Financieringspercentages_Annuiteitenfactor.xlsx",sheet_name='Annuiteitenfactor') 
-studieschuldtabel['Debetrente'] = studieschuldtabel['Debetrente'].apply(lambda x: f"{x:.3f}".replace('.',','))
-        
-# max LTI & LTV allebei weergeven
-# LTI verplaatsen
-# Eindantwoord weergeven    
-
-#%%
-
-
-#aflossingen, rentebedragen, resterende_schulden = lineaire_hypotheek(hoofdsom, looptijd_jaren, rentepercentage)
-#print_aflossingstabel(aflossingen, rentebedragen, resterende_schulden)
