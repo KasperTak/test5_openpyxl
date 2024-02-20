@@ -108,13 +108,13 @@ with tab1:
             woonquote = None
             debetrente = debetrente.replace(',', '')
             for rij in VOOR_AOW.iter_rows():
-                if rij[1].value == toetsinkomen:
+                if rij[0].value == int(toetsinkomen.replace(',', '')):
                     woonquote = rij[int(debetrente)].value
                     break
         else:
             woonquote = None
             for rij in NA_AOW.iter_rows():
-                if rij[0].value == toetsinkomen:
+                if rij[0].value == int(toetsinkomen.replace(',', '')):
                     woonquote = rij[int(debetrente)].value
                     break
             
