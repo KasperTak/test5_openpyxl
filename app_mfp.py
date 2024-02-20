@@ -108,13 +108,13 @@ with tab1:
             woonquote = None
             for rij in VOOR_AOW.iter_rows():
                 if rij[0].value == toetsinkomen:
-                    woonquote = rij[debetrente].value
+                    woonquote = rij[int(debetrente)].value
                     break
         else:
             woonquote = None
             for rij in NA_AOW.iter_rows():
                 if rij[0].value == toetsinkomen:
-                    woonquote = rij[debetrente].value
+                    woonquote = rij[int(debetrente)].value
                     break
             
         finan_ink = gez_ink * woonquote
