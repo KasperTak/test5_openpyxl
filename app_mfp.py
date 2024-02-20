@@ -108,7 +108,7 @@ with tab1:
             woonquote = None
             debetrente = debetrente.replace(',', '')
             for rij in VOOR_AOW.iter_rows():
-                if rij[0].value == toetsinkomen:
+                if rij[1].value == toetsinkomen:
                     woonquote = rij[int(debetrente)].value
                     break
         else:
