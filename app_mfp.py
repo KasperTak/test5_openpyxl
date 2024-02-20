@@ -107,14 +107,15 @@ with tab1:
         if leeftijd < AOW_leeftijd:
             woonquote = None
             debetrente = debetrente.replace(',', '')
+            toetsinkomen = toetsinkomen.replace(',', '')
             for rij in VOOR_AOW.iter_rows():
-                if rij[0].value == int(toetsinkomen.replace(',', '')):
+                if rij[0].value == toetsinkomen:
                     woonquote = rij[int(debetrente)].value
                     break
         else:
             woonquote = None
             for rij in NA_AOW.iter_rows():
-                if rij[0].value == int(toetsinkomen.replace(',', '')):
+                if rij[0].value == int(toetsinkomen):
                     woonquote = rij[int(debetrente)].value
                     break
             
